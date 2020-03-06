@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Upload</title>
+</head>
+<body>
+  <h1>Simple Upload</h1>
+  <hr>
+  <input id="fileInput" type="file" accept="image/*" />
+  <div>
+    <img id="serverImage" src="" alt="">
+  </div>
+  <script src="./js/ajax.js"></script>
+  <script>
+    const fileInput = document.getElementById('fileInput')
+    const uploadImage = function(){
+      const formData = new FormData()
+
+      formData.append('chunk', this.files[0])
+
+      $ajax({
+        url: 'http://127.0.0.1:3000/single',
+        method: 'POST',
+        data: formData,
+      })
+    }
+
+    fileInput.addEventListener('change', uploadImage)
+  </script>
+</body>
+</html>
