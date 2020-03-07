@@ -15,19 +15,52 @@
   <script src="./js/ajax.js"></script>
   <script>
     const fileInput = document.getElementById('fileInput')
-    const uploadImage = function(){
+    const uploadImageByFormData = async function(){
       const formData = new FormData()
+      const file = this.files[0]
 
-      formData.append('chunk', this.files[0])
+      formData.append('chunk', file)
+      formData.append('filename', file.name)
 
-      $ajax({
+      const result = await $ajax({
         url: 'http://127.0.0.1:3000/single',
         method: 'POST',
         data: formData,
       })
+      if(result.code === 200){
+        document.getElementById('serverImage').src = result.data
+      }
     }
 
-    fileInput.addEventListener('change', uploadImage)
+    const converFileToBase64 = function(file){
+      return new Promise((resolve, reject) => {
+        const fileReader = new FileReader()
+
+        fileReader.onload = (event) => resolve(event.target.result)
+        fileReader.onerror = (err) => reject(err)
+        fileReader.readAsDataURL(file)
+      })
+    }
+
+    const uploadImageByBase64 = async function(){
+      const file = this.files[0]
+      const base64 = await converFileToBase64(file)
+
+      const result = await $ajax({
+        url: 'http://127.0.0.1:3000/upload-img-base64',
+        method: 'POST',
+        data: `chunk=${encodeURIComponent(base64)}&filename=${file.name}`,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+
+      if(result.code === 200){
+        document.getElementById('serverImage').src = result.data
+      }
+    }
+
+    fileInput.addEventListener('change', uploadImageByBase64)
   </script>
 </body>
 </html>

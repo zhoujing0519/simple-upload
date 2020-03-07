@@ -1,12 +1,19 @@
 function $ajax(options){
+  options = Object.assign({
+    url: '',
+    method: 'POST',
+    data: null,
+    headers: {},
+  }, options)
+  
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
 
-    options = Object.assign({
-      url: '',
-      method: 'POST',
-      data: null,
-    }, options)
+    xhr.open(options.method, options.url)
+    
+    Object.keys(options.headers).forEach((key) => {
+      xhr.setRequestHeader(key, options.headers[key])
+    })
 
     xhr.onreadystatechange = function(){
       if(this.readyState !== 4) return
@@ -14,7 +21,6 @@ function $ajax(options){
 
       return resolve(JSON.parse(this.responseText))
     }
-    xhr.open(options.url, options.method)
     xhr.send(options.data)
   })
 }
